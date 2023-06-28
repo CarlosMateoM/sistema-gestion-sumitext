@@ -1,151 +1,138 @@
 <script setup>
+import { useForm, Head, Link } from '@inertiajs/vue3'
+import { mdiAccount, mdiAsterisk } from '@mdi/js'
+import LayoutGuest from '@/layouts/LayoutGuest.vue'
+import SectionFullScreen from '@/components/SectionFullScreen.vue'
+import CardBox from '@/components/CardBox.vue'
+import FormCheckRadioGroup from '@/components/FormCheckRadioGroup.vue'
+import FormField from '@/components/FormField.vue'
+import FormControl from '@/components/FormControl.vue'
+import BaseDivider from '@/components/BaseDivider.vue'
+import BaseButton from '@/components/BaseButton.vue'
+import BaseButtons from '@/components/BaseButtons.vue'
+import FormValidationErrors from '@/components/FormValidationErrors.vue'
+import NotificationBarInCard from '@/components/NotificationBarInCard.vue'
+import BaseLevel from '@/components/BaseLevel.vue'
 
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-
-defineProps({
-    canResetPassword: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+const props = defineProps({
+  canResetPassword: Boolean,
+  status: {
+    type: String,
+    default: null
+  }
+})
 
 const form = useForm({
-    email: '',
-    password: '',
-    remember: false,
-});
+  email: '',
+  password: '',
+  remember: []
+})
 
 const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
-    });
-};
+  form
+    .transform(data => ({
+      ... data,
+      remember: form.remember && form.remember.length ? 'on' : ''
+    }))
+    .post(route('login'), {
+      onFinish: () => form.reset('password'),
+    })
+}
 </script>
 
 <template>
-    <!--
-    <GuestLayout>
+  <LayoutGuest>
+    <Head title="Login" />
+    
+    <SectionFullScreen
+      v-slot="{ cardClass }"
+    >
+      <CardBox
+        :class="cardClass"
+        is-form
+        @submit.prevent="submit"
+      >
+        <FormValidationErrors />
 
-        <Head title="Log in" />
+        <NotificationBarInCard 
+          v-if="status"
+          color="info"
+        >
+          {{ status }}
+        </NotificationBarInCard>
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
-            {{ status }}
-        </div>
+        <FormField
+          label="Correo"
+          label-for="email"
+          help="Por favor, ingrese su correo electronico"
+        >
+          <FormControl
+            v-model="form.email"
+            :icon="mdiAccount"
+            id="email"
+            autocomplete="email"
+            type="email"
+            required
+          />
+        </FormField>
 
-        <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
+        <FormField
+          label="Contraseña"
+          label-for="password"
+          help="Por favor, ingrese su contraseña"
+        >
+          <FormControl
+            v-model="form.password"
+            :icon="mdiAsterisk"
+            type="password"
+            id="password"
+            autocomplete="current-password"
+            required
+          />
+        </FormField>
+        <!--
 
-                <TextInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autofocus
-                    autocomplete="username" />
+          PROXIMAMENTE!!
 
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
+          <FormCheckRadioGroup
+          v-model="form.remember"
+          name="remember"
+          :options="{ remember: 'Remember' }"
+          />
+        -->
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+        <BaseDivider />
 
-                <TextInput id="password" type="password" class="mt-1 block w-full" v-model="form.password" required
-                    autocomplete="current-password" />
+        <BaseLevel>
+          <BaseButtons>
+            <BaseButton
+              type="submit"
+              color="info"
+              label="Iniciar sesion"
+              :class="{ 'opacity-25': form.processing }"
+              :disabled="form.processing"
+            />
+            <!--
+              
+              PROXIMAMENTE!!
 
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
-
-            <div class="block mt-4">
-                <label class="flex items-center">
-                    <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                <Link v-if="canResetPassword" :href="route('password.request')"
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Forgot your password?
-                </Link>
-
-                <PrimaryButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Log in
-                </PrimaryButton>
-            </div>
-        </form>
-
-    </GuestLayout>
-    -->
-
-    <GuestLayout>
-
-        <Head title="Log in" />
-
-        <div class="flex h-screen">
-
-            <div class="flex min-h-full w-1/2 flex-col justify-center px-6 py-12 lg:px-8">
-
-
-                <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
-                    {{ status }}
-                </div>
-
-
-                <div class=" sm:mx-auto sm:w-full sm:max-w-sm">
-                    <h2 class="mb-10 text-left text-3xl font-bold leading-9 tracking-tight text-gray-500">
-                        SUMITEXT DE LA COSTA
-                    </h2>
-
-                    <form @submit.prevent="submit" class="space-y-6">
-                        <div>
-                            <label for="email" class="block text-sm font-medium leading-6 text-gray-900">
-                                Correo:
-                            </label>
-                            <div class="mt-2">
-                                <input id="email" name="email" type="email" autocomplete="email" required
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    v-model="form.email">
-                            </div>
-                            <InputError class="mt-2" :message="form.errors.email" />
-                        </div>
-
-                        <div>
-                            <label for="password" class="block text-sm font-medium leading-6 text-gray-900">
-                                Contraseña:
-                            </label>
-
-                            <div class="mt-2">
-                                <input id="password" name="password" type="password" autocomplete="current-password"
-                                    required
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                    v-model="form.password">
-                            </div>
-
-                            <InputError class="mt-2" :message="form.errors.password" />
-                        </div>
-
-                        <div>
-                            <button type="submit"
-                                class="flex w-full justify-center mt-12 rounded-md bg-indigo-600 px-3 py-3 text-18 font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                                Iniciar sesion
-                            </button>
-
-                        </div>
-                    </form>
-
-                    <Link :href="route('register')"
-                        class="flex w-full justify-center mt-3 rounded-md bg-indigo-800 px-3 py-3 text-18 font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                    Registrarse
-                    </Link>
-
-                </div>
-
-            </div>
-            <div class="w-1/2">
-                <img src="https://images.pexels.com/photos/3771080/pexels-photo-3771080.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                    class="w-full h-screen object-cover">
-            </div>
-        </div>
-
-    </GuestLayout>
+              <BaseButton
+              v-if="canResetPassword"
+              route-name="password.request"
+              color="info"
+              outline
+              label="Remind"
+              />
+            -->
+            <BaseButton 
+              route-name="register" 
+              color="info" 
+              outline 
+              label="Registrarse" 
+            />
+          </BaseButtons>
+        </BaseLevel>
+      </CardBox>
+    </SectionFullScreen>
+  </LayoutGuest>
 </template>
