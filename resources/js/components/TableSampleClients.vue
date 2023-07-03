@@ -1,6 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
-import { useMainStore } from "@/stores/main";
+import { ref } from "vue";
 import { mdiEye, mdiTrashCan } from "@mdi/js";
 import CardBoxModal from "@/components/CardBoxModal.vue";
 import TableCheckboxCell from "@/components/TableCheckboxCell.vue";
@@ -8,159 +7,142 @@ import BaseLevel from "@/components/BaseLevel.vue";
 import BaseButtons from "@/components/BaseButtons.vue";
 import BaseButton from "@/components/BaseButton.vue";
 import UserAvatar from "@/components/UserAvatar.vue";
+import CardBox from "./CardBox.vue";
+import { useForm } from "@inertiajs/vue3";
 
-defineProps({
+const props = defineProps({
+  customers: Object,
   checkable: Boolean,
 });
-
-const mainStore = useMainStore();
-
-const items = computed(() => mainStore.clients);
 
 const isModalActive = ref(false);
 
 const isModalDangerActive = ref(false);
 
-const perPage = ref(5);
+const customerSelectedToDestroy = ref(null);
 
-const currentPage = ref(0);
-
-const checkedRows = ref([]);
-
-const itemsPaginated = computed(() =>
-  items.value.slice(
-    perPage.value * currentPage.value,
-    perPage.value * (currentPage.value + 1)
-  )
-);
-
-const numPages = computed(() => Math.ceil(items.value.length / perPage.value));
-
-const currentPageHuman = computed(() => currentPage.value + 1);
-
-const pagesList = computed(() => {
-  const pagesList = [];
-
-  for (let i = 0; i < numPages.value; i++) {
-    pagesList.push(i);
-  }
-
-  return pagesList;
-});
-
-const remove = (arr, cb) => {
-  const newArr = [];
-
-  arr.forEach((item) => {
-    if (!cb(item)) {
-      newArr.push(item);
-    }
-  });
-
-  return newArr;
+const openCustomerDestroyModal = (customer) => {
+  isModalDangerActive.value = true;
+  customerSelectedToDestroy.value = customer;
 };
 
-const checked = (isChecked, client) => {
-  if (isChecked) {
-    checkedRows.value.push(client);
-  } else {
-    checkedRows.value = remove(
-      checkedRows.value,
-      (row) => row.id === client.id
-    );
-  }
+const destroyCustomer = () => {
+  const customerId = customerSelectedToDestroy.value.id;
+
+  useForm({}).delete(route('customers.destroy', {
+     customer: customerId 
+    }), {
+      preserveScroll: true,
+      onSuccess: () => {
+
+      }
+    });  
 };
+
 </script>
 
 <template>
-  <CardBoxModal v-model="isModalActive" title="Sample modal">
-    <p>Lorem ipsum dolor sit amet <b>adipiscing elit</b></p>
-    <p>This is sample modal</p>
-  </CardBoxModal>
-
-  <CardBoxModal
-    v-model="isModalDangerActive"
-    title="Please confirm"
-    button="danger"
-    has-cancel
+  <CardBox class="mb-6" has-table>
+  <CardBoxModal  
+    v-model="isModalActive"
+    title="Sample modal" 
   >
     <p>Lorem ipsum dolor sit amet <b>adipiscing elit</b></p>
     <p>This is sample modal</p>
   </CardBoxModal>
-
-  <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
+    
+  <CardBoxModal
+    v-model="isModalDangerActive"
+    title="Confirmación de eliminación"
+    button="danger"
+    has-cancel
+    button-label="Aceptar"
+    @confirm="destroyCustomer"
+  >
+    <p>Desea eliminar el cliente <b v-if="customerSelectedToDestroy"> {{ customerSelectedToDestroy.first_name  + " " + customerSelectedToDestroy.last_name }} </b></p>
+  </CardBoxModal>
+  
+  <!--
+    <div v-if="checkedRows.length" class="p-3 bg-gray-100/50 dark:bg-slate-800">
     <span
-      v-for="checkedRow in checkedRows"
-      :key="checkedRow.id"
-      class="inline-block px-2 py-1 rounded-sm mr-2 text-sm bg-gray-100 dark:bg-slate-700"
+    v-for="checkedRow in checkedRows"
+    :key="checkedRow.id"
+    class="inline-block px-2 py-1 rounded-sm mr-2 text-sm bg-gray-100 dark:bg-slate-700"
     >
-      {{ checkedRow.name }}
-    </span>
-  </div>
+    {{ checkedRow.name }}
+  </span>
+</div>
 
+-->
   <table>
     <thead>
       <tr>
         <th v-if="checkable" />
         <th />
-        <th>Name</th>
-        <th>Company</th>
-        <th>City</th>
-        <th>Progress</th>
-        <th>Created</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Dirección</th>
+        <!--
+          <th>Progreso</th>
+        -->
+        <th>Creado en</th>
+
         <th />
       </tr>
     </thead>
     <tbody>
-      <tr v-for="client in itemsPaginated" :key="client.id">
+      <tr v-for="customer in props.customers.data" :key="customer.id">
         <TableCheckboxCell
           v-if="checkable"
-          @checked="checked($event, client)"
+          @checked="checked($event, customer)"
         />
         <td class="border-b-0 lg:w-6 before:hidden">
           <UserAvatar
-            :username="client.name"
+            :username="customer.first_name"
             class="w-24 h-24 mx-auto lg:w-6 lg:h-6"
           />
         </td>
-        <td data-label="Name">
-          {{ client.name }}
+        <td data-label="Nombre">
+          {{ customer.first_name + " " + customer.last_name }}
         </td>
-        <td data-label="Company">
-          {{ client.company }}
+        <td data-label="Telefono">
+          {{ customer.phone }}
         </td>
-        <td data-label="City">
-          {{ client.city }}
+        <td data-label="Direccion">
+          {{ customer.address }}
         </td>
-        <td data-label="Progress" class="lg:w-32">
-          <progress
+        <!--
+
+          <td data-label="progress">
+            <progress
             class="flex w-2/5 self-center lg:w-full"
             max="100"
-            :value="client.progress"
-          >
-            {{ client.progress }}
-          </progress>
-        </td>
-        <td data-label="Created" class="lg:w-1 whitespace-nowrap">
+            :value="23"
+            />
+          </td>
+        -->
+        <td data-label="Created" >
           <small
             class="text-gray-500 dark:text-slate-400"
-            :title="client.created"
-            >{{ client.created }}</small
+            :title="customer.created_at"
+            >{{ (customer.created_at + "").slice(0, 10) }}</small
           >
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
+            <!-- PROXIMAMENTE
             <BaseButton
               color="info"
               :icon="mdiEye"
               small
               @click="isModalActive = true"
-            />
-            <BaseButton
+              />
+              -->
+              <BaseButton
               color="danger"
               :icon="mdiTrashCan"
+              @click="openCustomerDestroyModal(customer)"   
               small
-              @click="isModalDangerActive = true"
             />
           </BaseButtons>
         </td>
@@ -169,18 +151,34 @@ const checked = (isChecked, client) => {
   </table>
   <div class="p-3 lg:px-6 border-t border-gray-100 dark:border-slate-800">
     <BaseLevel>
-      <BaseButtons>
-        <BaseButton
-          v-for="page in pagesList"
-          :key="page"
-          :active="page === currentPage"
-          :label="page + 1"
-          :color="page === currentPage ? 'lightDark' : 'whiteDark'"
-          small
-          @click="currentPage = page"
-        />
-      </BaseButtons>
-      <small>Page {{ currentPageHuman }} of {{ numPages }}</small>
+      <BaseButtons>  
+    <BaseButton
+      v-if="props.customers.prev_page_url"
+      :label="'&laquo; Anterior'"
+      :color="'whiteDark'"
+      small
+      @click="$inertia.visit(props.customers.prev_page_url, { preserveScroll: true })"
+    />
+    <BaseButton
+      v-for="page in props.customers.links.slice(1, -1)"
+      :key="page.url"
+      :active="page.active"
+      :label="page.label"
+      :color="page.active ? 'lightDark' : 'whiteDark'"
+      small
+      @click="$inertia.visit(page.url, { preserveScroll: true })"
+    />
+    <BaseButton
+      v-if="props.customers.next_page_url"
+      :label="'Siguiente &raquo;'"
+      :color="'whiteDark'"
+      small
+      @click="$inertia.visit(props.customers.next_page_url, { preserveScroll: true })"
+    />
+        </BaseButtons>
+      <small>Página {{ props.customers.current_page }} de {{ props.customers.last_page }}</small>
     </BaseLevel>
   </div>
+</CardBox>
+
 </template>

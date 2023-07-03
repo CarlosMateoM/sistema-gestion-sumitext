@@ -5,6 +5,7 @@ import {
   mdiLock,
   mdiAlertCircle,
   mdiSquareEditOutline,
+  mdiAccountMultiple,
   mdiTable,
   mdiViewList,
   mdiTelevisionGuide,
@@ -15,14 +16,14 @@ import {
 
 export default [
   {
-    to: "/dashboard",
+    route: "dashboard",
     icon: mdiMonitor,
-    label: "Dashboard",
+    label: "Resumen",
   },
   {
-    to: "/tables",
-    label: "Tables",
-    icon: mdiTable,
+    route: "customers.index",
+    icon: mdiAccountMultiple,
+    label: "Clientes",
   },
   {
     to: "/forms",
@@ -58,8 +59,8 @@ export default [
     to: "/error",
     label: "Error",
     icon: mdiAlertCircle,
-  },
-  {
+  }
+  /*{
     label: "Dropdown",
     icon: mdiViewList,
     menu: [
@@ -82,5 +83,5 @@ export default [
     label: "React version",
     icon: mdiReact,
     target: "_blank",
-  },
+  }*/,
 ];

@@ -1,4 +1,5 @@
 <script setup>
+import { defineExpose } from "vue";
 import { ref, computed, useSlots } from "vue";
 import { mdiClose } from "@mdi/js";
 import { colorsBgLight, colorsOutline } from "@/colors.js";
@@ -18,19 +19,25 @@ const props = defineProps({
   },
 });
 
+
 const componentClass = computed(() =>
   props.outline ? colorsOutline[props.color] : colorsBgLight[props.color]
 );
 
-const isDismissed = ref(false);
+const isDismissed = ref(true);
 
 const dismiss = () => {
-  isDismissed.value = true;
+  isDismissed.value = !isDismissed.value;
 };
 
 const slots = useSlots();
 
 const hasRightSlot = computed(() => slots.right);
+
+defineExpose({
+  dismiss,
+})
+
 </script>
 
 <template>

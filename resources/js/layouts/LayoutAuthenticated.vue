@@ -1,7 +1,9 @@
 <script setup>
+import { usePage } from "@inertiajs/vue3";
 import { mdiForwardburger, mdiBackburger, mdiMenu } from "@mdi/js";
 import { ref } from "vue";
-import { router } from "@inertiajs/vue3";
+import { router, useForm } from "@inertiajs/vue3";
+import { debounce } from 'lodash';
 import menuAside from "@/menuAside.js";
 import menuNavBar from "@/menuNavBar.js";
 import { useMainStore } from "@/stores/main.js";
@@ -12,6 +14,9 @@ import NavBar from "@/components/NavBar.vue";
 import NavBarItemPlain from "@/components/NavBarItemPlain.vue";
 import AsideMenu from "@/components/AsideMenu.vue";
 
+const styleStore = useStyleStore();
+const { props } = usePage();
+
 
 useMainStore().setUser({
   name: "John Doe",
@@ -20,9 +25,21 @@ useMainStore().setUser({
     "https://avatars.dicebear.com/api/avataaars/example.svg?options[top][]=shortHair&options[accessoriesChance]=93",
 });
 
-const layoutAsidePadding = "xl:pl-60";
+useMainStore().setUser(props.auth.user);
 
-const styleStore = useStyleStore();
+
+const form = useForm({
+  search: ""
+});
+
+const submit = debounce(() => {
+  form.get(route('customers.index'), {
+    preserveScroll: true,
+    preserveState: true
+  })
+}, 500);
+
+const layoutAsidePadding = "xl:pl-60";
 
 const isAsideMobileExpanded = ref(false);
 const isAsideLgActive = ref(false);
@@ -44,30 +61,51 @@ const menuClick = (event, item) => {
 </script>
 
 <template>
-  <div 
-    :class="{
-      dark: styleStore.darkMode,
-      'overflow-hidden lg:overflow-visible': isAsideMobileExpanded,
-    }"
-  >
+  <div :class="{
+    dark: styleStore.darkMode,
+    'overflow-hidden lg:overflow-visible': isAsideMobileExpanded,
+  }">
     <div :class="[layoutAsidePadding, { 'ml-60 lg:ml-0': isAsideMobileExpanded }]"
       class="pt-14 min-h-screen w-screen transition-position lg:w-auto bg-gray-50 dark:bg-slate-800 dark:text-slate-100">
       <NavBar :menu="menuNavBar" :class="[
         layoutAsidePadding,
         { 'ml-60 lg:ml-0': isAsideMobileExpanded },
       ]" @menu-click="menuClick">
+        
+        <!-- Menú responsivo -->
         <NavBarItemPlain display="flex lg:hidden" @click.prevent="isAsideMobileExpanded = !isAsideMobileExpanded">
           <BaseIcon :path="isAsideMobileExpanded ? mdiBackburger : mdiForwardburger" size="24" />
         </NavBarItemPlain>
         <NavBarItemPlain display="hidden lg:flex xl:hidden" @click.prevent="isAsideLgActive = true">
           <BaseIcon :path="mdiMenu" size="24" />
         </NavBarItemPlain>
-        <NavBarItemPlain use-margin>
-          <FormControl placeholder="Search (ctrl+k)" ctrl-k-focus transparent borderless />
+        
+        <!--Formulario de barra de busqueda-->
+        <NavBarItemPlain use-marginh class="w-full" >
+          <FormControl 
+          id="search"
+          name="search"
+          class="w-full"
+          v-model="form.search" 
+          @input="submit" 
+          placeholder="Buscar (ctrl+k)" 
+          ctrl-k-focus 
+          transparent
+          borderless 
+          autocomplete="on"
+          />
         </NavBarItemPlain>
+
       </NavBar>
-      <AsideMenu :is-aside-mobile-expanded="isAsideMobileExpanded" :is-aside-lg-active="isAsideLgActive" :menu="menuAside"
-        @menu-click="menuClick" @aside-lg-close-click="isAsideLgActive = false" />
+
+      <AsideMenu 
+        :is-aside-mobile-expanded="isAsideMobileExpanded" 
+        :is-aside-lg-active="isAsideLgActive" 
+        :menu="menuAside"
+        @menu-click="menuClick" 
+        @aside-lg-close-click="isAsideLgActive = false" 
+        />
+
       <slot />
 
     </div>

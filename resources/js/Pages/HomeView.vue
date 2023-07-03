@@ -24,13 +24,20 @@ import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
 
 
+const props = defineProps({
+  user: Object,
+  customers: Number,
+})
+
 const chartData = ref(null);
 
 const mainStore = useMainStore();
 
 onMounted(() => {
+  mainStore.setUser(props.user);
   fillChartData();
 });
+
 
 const fillChartData = () => {
   chartData.value = chartConfig.sampleChartData();
@@ -49,14 +56,14 @@ const transactionBarItems = computed(() => mainStore.history);
 
     <SectionMain>
 
-      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Overview" main>
+      <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Resumen" main>
 
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
 
-        <CardBoxWidget trend="12%" trend-type="up" color="text-emerald-500" :icon="mdiAccountMultiple" :number="512"
-          label="Clients" />
+        <CardBoxWidget trend="12%" trend-type="up" color="text-emerald-500" :icon="mdiAccountMultiple"
+          :number="props.customers" label="Clientes" />
 
         <CardBoxWidget trend="12%" trend-type="down" color="text-blue-500" :icon="mdiCartOutline" :number="7770"
           prefix="$" label="Sales" />
@@ -88,18 +95,8 @@ const transactionBarItems = computed(() => mainStore.history);
         </div>
       </CardBox>
 
-      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Clients" />
-
-      <NotificationBar color="info" :icon="mdiMonitorCellphone">
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
-
-      <CardBox has-table>
-        <TableSampleClients />
-      </CardBox>
 
     </SectionMain>
 
   </LayoutAuthenticated>
-  
 </template>

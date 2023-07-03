@@ -23,6 +23,7 @@ const avatar = computed(
       /[^a-z0-9]+/i,
       "-"
     )}.svg`
+    
 );
 
 const username = computed(() => props.username);
