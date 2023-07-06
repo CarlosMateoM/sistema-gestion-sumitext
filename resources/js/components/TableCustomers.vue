@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { mdiEye, mdiTrashCan } from "@mdi/js";
+import { mdiTrashCan } from "@mdi/js";
 import CardBoxModal from "@/components/CardBoxModal.vue";
 import TableCheckboxCell from "@/components/TableCheckboxCell.vue";
 import BaseLevel from "@/components/BaseLevel.vue";
@@ -43,7 +43,8 @@ const destroyCustomer = () => {
 
 <template>
   <CardBox class="mb-6" has-table>
-  <CardBoxModal  
+  
+    <CardBoxModal  
     v-model="isModalActive"
     title="Sample modal" 
   >
@@ -55,8 +56,8 @@ const destroyCustomer = () => {
     v-model="isModalDangerActive"
     title="Confirmación de eliminación"
     button="danger"
-    has-cancel
     button-label="Aceptar"
+    has-cancel
     @confirm="destroyCustomer"
   >
     <p>Desea eliminar el cliente <b v-if="customerSelectedToDestroy"> {{ customerSelectedToDestroy.first_name  + " " + customerSelectedToDestroy.last_name }} </b></p>

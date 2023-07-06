@@ -19,24 +19,21 @@ const props = defineProps({
   },
 });
 
+const slots = useSlots();
+const isDismissed = ref(true);
+const hasRightSlot = computed(() => slots.right);
 
 const componentClass = computed(() =>
   props.outline ? colorsOutline[props.color] : colorsBgLight[props.color]
 );
 
-const isDismissed = ref(true);
-
 const dismiss = () => {
   isDismissed.value = !isDismissed.value;
 };
 
-const slots = useSlots();
-
-const hasRightSlot = computed(() => slots.right);
-
 defineExpose({
   dismiss,
-})
+});
 
 </script>
 
@@ -56,15 +53,17 @@ defineExpose({
           size="24"
           class="md:mr-2"
         />
-        <span class="text-center md:text-left md:py-2"><slot /></span>
+        <span class="text-center md:text-left md:py-2">
+          <slot />
+        </span>
       </div>
       <slot v-if="hasRightSlot" name="right" />
       <BaseButton
         v-else
-        :icon="mdiClose"
         small
         rounded-full
         color="white"
+        :icon="mdiClose"
         @click="dismiss"
       />
     </BaseLevel>

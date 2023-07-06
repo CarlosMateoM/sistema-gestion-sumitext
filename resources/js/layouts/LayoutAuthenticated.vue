@@ -32,15 +32,28 @@ const form = useForm({
   search: ""
 });
 
+const routeName = () => {
+  
+  if (route().current('customers.index')) {
+    return 'customers.index';
+  } else if (route().current('orders.index')) {
+    return 'orders.index';
+  } else {
+    return 'default.route';
+  }
+}
+
 const submit = debounce(() => {
-  form.get(route('customers.index'), {
+
+  const currentRoute = routeName();
+
+  form.get(route(currentRoute), {
     preserveScroll: true,
     preserveState: true
   })
 }, 500);
 
 const layoutAsidePadding = "xl:pl-60";
-
 const isAsideMobileExpanded = ref(false);
 const isAsideLgActive = ref(false);
 
@@ -71,7 +84,7 @@ const menuClick = (event, item) => {
         layoutAsidePadding,
         { 'ml-60 lg:ml-0': isAsideMobileExpanded },
       ]" @menu-click="menuClick">
-        
+
         <!-- Menú responsivo -->
         <NavBarItemPlain display="flex lg:hidden" @click.prevent="isAsideMobileExpanded = !isAsideMobileExpanded">
           <BaseIcon :path="isAsideMobileExpanded ? mdiBackburger : mdiForwardburger" size="24" />
@@ -79,32 +92,17 @@ const menuClick = (event, item) => {
         <NavBarItemPlain display="hidden lg:flex xl:hidden" @click.prevent="isAsideLgActive = true">
           <BaseIcon :path="mdiMenu" size="24" />
         </NavBarItemPlain>
-        
+
         <!--Formulario de barra de busqueda-->
-        <NavBarItemPlain use-marginh class="w-full" >
-          <FormControl 
-          id="search"
-          name="search"
-          class="w-full"
-          v-model="form.search" 
-          @input="submit" 
-          placeholder="Buscar (ctrl+k)" 
-          ctrl-k-focus 
-          transparent
-          borderless 
-          autocomplete="on"
-          />
+        <NavBarItemPlain use-marginh class="w-full">
+          <FormControl id="search" name="search" class="w-full" v-model="form.search" @input="submit"
+            placeholder="Buscar (ctrl+k)" ctrl-k-focus transparent borderless autocomplete="on" />
         </NavBarItemPlain>
 
       </NavBar>
 
-      <AsideMenu 
-        :is-aside-mobile-expanded="isAsideMobileExpanded" 
-        :is-aside-lg-active="isAsideLgActive" 
-        :menu="menuAside"
-        @menu-click="menuClick" 
-        @aside-lg-close-click="isAsideLgActive = false" 
-        />
+      <AsideMenu :is-aside-mobile-expanded="isAsideMobileExpanded" :is-aside-lg-active="isAsideLgActive" :menu="menuAside"
+        @menu-click="menuClick" @aside-lg-close-click="isAsideLgActive = false" />
 
       <slot />
 

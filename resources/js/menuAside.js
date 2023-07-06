@@ -1,17 +1,13 @@
 import {
   mdiAccountCircle,
   mdiMonitor,
-  mdiGithub,
   mdiLock,
   mdiAlertCircle,
-  mdiSquareEditOutline,
   mdiAccountMultiple,
-  mdiTable,
-  mdiViewList,
   mdiTelevisionGuide,
   mdiResponsive,
   mdiPalette,
-  mdiReact,
+  mdiPlaylistCheck
 } from "@mdi/js";
 
 export default [
@@ -26,9 +22,9 @@ export default [
     label: "Clientes",
   },
   {
-    to: "/forms",
-    label: "Forms",
-    icon: mdiSquareEditOutline,
+    route: "orders.index",
+    icon: mdiPlaylistCheck,
+    label: "Pedidos",
   },
   {
     to: "/ui",

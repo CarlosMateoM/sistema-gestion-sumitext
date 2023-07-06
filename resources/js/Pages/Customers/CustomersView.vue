@@ -4,7 +4,7 @@ import {
 } from "@mdi/js";
 import SectionMain from "@/components/SectionMain.vue";
 import CustomerForm from "./CustomerForm.vue";
-import TableSampleClients from "@/components/TableSampleClients.vue";
+import TableCustomers from "@/components/TableCustomers.vue";
 import LayoutAuthenticated from "@/layouts/LayoutAuthenticated.vue";
 import SectionTitleLineWithButton from "@/components/SectionTitleLineWithButton.vue";
 
@@ -25,7 +25,7 @@ const props = defineProps({
         main 
       />
 
-      <TableSampleClients 
+      <TableCustomers 
         :customers="customers"
       />
       
