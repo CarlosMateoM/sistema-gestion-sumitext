@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DesignController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/pedidos', [OrderController::class, 'store'])->name('orders.store');
     Route::put('/pedidos/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('/pedidos/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+
+
+    Route::get('/disenos', [DesignController::class, 'index'])->name('disenos.index');
     
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

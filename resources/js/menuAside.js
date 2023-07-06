@@ -28,12 +28,12 @@ export default [
   },
   {
     to: "/ui",
-    label: "UI",
     icon: mdiTelevisionGuide,
+    label: "Produccion",
   },
   {
-    to: "/responsive",
-    label: "Responsive",
+    route: "disenos.index",
+    label: "Diseños",
     icon: mdiResponsive,
   },
   {
